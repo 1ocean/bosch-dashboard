@@ -1,0 +1,3215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>博世车联网</title>
+  <!--  <link rel="stylesheet" href="css/index.css">-->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/element.css">
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/report.css">
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+
+    :not(:root):-webkit-full-screen::backdrop {
+      background: white;
+    }
+    video[Attributes]{
+      height: 80%;
+    }
+  </style>
+
+</head>
+<body>
+<div style="height: 100%" id="quanping">
+  <!--  首部图片  -->
+  <img src="img/top.png" height="16" width="100%"/>
+  <div id="main" v-cloak>
+    <!-- 左侧点击弹出框   -->
+    <div @click="drawerControl" class="button-drawer">
+      <img src="img/open.svg" height="150%" width="150%"/>
+
+    </div>
+    <el-drawer
+      :visible.sync="drawer"
+      :direction="direction"
+    >
+      <div class="menu-left">
+        <div class="menu-div" @click="handShowVideoClick">
+          <p>
+            在线动力总成专家
+          </p>
+          <p>
+            Online powertrain expert
+          </p>
+          <img src="img/menu-xiangzuo.svg" height="25%" width="9%" style="cursor: pointer" @click="handShowVideoClick"/>
+        </div>
+        <div class="menu-div1" @click="handTCOClick">
+          <p>
+            车辆全生命周期用车成本优化
+          </p>
+          <p>
+            TCO optimization
+          </p>
+          <img src="img/menu-xiangzuo.svg" height="25%" width="9%" style="cursor: pointer"/>
+
+        </div>
+        <div class="menu-div2" @click="handVideoClick">
+          <p>
+            视频展示
+          </p>
+          <p>
+            Video Show
+          </p>
+          <img src="img/menu-xiangzuo.svg" height="25%" width="9%" style="cursor: pointer" @click="handVideoClick"/>
+
+        </div>
+        <img src="img/left.png" height="100%" width="100%" style="position: absolute"/>
+
+        <!-- /.menu-div -->
+      </div>
+    </el-drawer>
+
+    <div id="TCO" v-cloak :class="{'TCO-clicked':TCOClick}">
+      <!--  最上方切换内容    -->
+      <div style="height: 15%;">
+        <el-row class="top-border">
+          <el-col :span="3" class="logo">
+            <img src="img/logo.png" height="40%" width="100%"/>
+          </el-col>
+          <el-col :span="4" class="logoWord">
+            <p class="logoWordC">车联网在线动力总成</p>
+            <p class="logoWordY">Connectivity of Online powertrain</p>
+          </el-col>
+          <el-col :span="4" style="margin-left: 3%;height: 100%">
+            <div class="top-3" :class="{'top-3-clicked':isActive}" @click="handleClick" v-show="wrapShow">
+              <el-row>
+                <el-col :span="6" style="height: 100%;text-align: center">
+                  <img src="img/report.svg" height="90%" width="50%"/>
+                </el-col>
+                <el-col :span="18" style="height: 100%">
+                  <p class="top-border-word1">车队油耗分析报告</p>
+                  <p class="top-border-word2">Fuel saving analysis report of fleet</p>
+                </el-col>
+              </el-row>
+            </div>
+          </el-col>
+          <el-col :span="4" style="margin-left: 1%;height: 100%">
+            <div class="top-3" :class="{'top-3-clicked':isActive1}" @click="handleClick1" v-show="wrapShow">
+              <el-row>
+                <el-col :span="6" style="height: 100%;text-align: center">
+                  <img src="img/protect.svg" height="90%" width="50%"/>
+                </el-col>
+                <el-col :span="18" style="height: 100%">
+                  <p class="top-border-word1">动力总成预防性维护</p>
+                  <p class="top-border-word2">Predictive maintenance of powertrain
+                    components</p>
+                </el-col>
+              </el-row>
+            </div>
+          </el-col>
+          <el-col :span="4" style="margin-left: 1%;height: 100%">
+            <div class="top-3" :class="{'top-3-clicked':isActive2}" v-show="wrapShow">
+              <el-row>
+                <el-col :span="6" style="height: 100%;text-align: center">
+                  <img src="img/health.svg" height="90%" width="50%"/>
+                </el-col>
+                <el-col :span="18" style="height: 100%">
+                  <p class="top-border-word1">动力总成健康管理</p>
+                  <p class="top-border-word2">Health management of powertrain</p>
+                </el-col>
+              </el-row>
+            </div>
+          </el-col>
+          <el-col :span="2" style="height: 100%;display: flex;justify-content: center;flex-direction: column;"
+                  v-if="this.isActive==true">
+            <el-select v-model="fleet" placeholder="请选择" @change="changeCarTeam">
+              <el-option
+                v-for="item in carList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+          </el-col>
+
+        </el-row>
+      </div>
+      <div style="height: 85%">
+        <!--  首页循环播放得视频      -->
+        <div id="showVideo" v-cloak :class="{'showVideo-clicked':showVideoClick}">
+          <div class="video-showVideo">
+            <video width="100%" height="100%" src="./video/showVideo.mp4" autoplay loop muted="muted">
+            </video>
+          </div>
+        </div>
+        <!--    video展示页面    -->
+        <div id="video" v-cloak :class="{'video-clicked':videoClick}">
+          <!--          <div class="video-show">-->
+          <!--            <video width="100%" height="50%" controls="controls" src="./video/TCO-1.mp4" poster="./img/video.jpg" preload="none" ref="video1">-->
+          <!--            </video>-->
+          <!--            <p>BOSCH TCO improvement solution</p>-->
+          <!--          </div>-->
+          <!-- <div class="video-show">
+                <video width="100%" height="50%" controls="controls" src="./video/TCO-2.mp4" poster="./img/video.jpg" preload="none" ref="video2">
+                </video>
+                <p>博世大屏展示</p>
+              </div> -->
+          <div v-show="one" class="video-show1" v-for="(item,itemIndex) in videoData" :key="itemIndex">
+            <video width="100%" height="72%" loop controls="controls" :src=item.video poster="./img/video.jpg" preload="none"
+                   :ref='"video-"+itemIndex'>
+            </video>
+            <p>{{item.name}}</p>
+          </div>
+          <div v-show="two" class="video-show" v-for="(item,itemIndex) in twoVideoData" :key="itemIndex">
+            <video width="100%" height="72%" loop controls="controls" :src=item.video poster="./img/video.jpg" preload="none"
+                   :ref='"twoVideo-"+itemIndex'>
+            </video>
+            <p>{{item.name}}</p>
+          </div>
+
+
+      </div>
+      <!--   动力总成预防性维护页面     -->
+      <div class="first" :class="{'main-clicked':mainClick2}">
+        <el-row style="height: 100%">
+          <el-col :span="14" class="first-main">
+            <div class="top-border-word">
+              <el-row class="top-border-word-sum">
+                <el-col :span="8">
+                  <p class="map-word1">当月运行车辆数
+                  <p class="map-word2">Monthly active vehicles</p>
+                  <p class="map-word3">{{runningNumber}}辆</p>
+                </el-col>
+                <el-col :span="8">
+                  <p class="map-word1">当前累计运行时间
+                  <p class="map-word2">Monthly Cumulative vehicle operating time </p>
+                  <p class="map-word3">{{ runningTime }}小时</p>
+                </el-col>
+                <el-col :span="8">
+                  <p class="map-word1">当月累计运行里程</p>
+                  <p class="map-word2">Monthly Cumulative mileages </p>
+                  <p class="map-word3">{{ cumulativeMileage }}公里</p>
+                </el-col>
+              </el-row>
+            </div>
+            <div id="main-1"></div>
+          </el-col>
+          <el-col style="height: 100%;width: 40.5%">
+            <el-row class="top-border-data">
+              <el-col :span="12">
+                <div class="top-border-data-word"><p>本月累计燃油消耗</p>
+                  <p class="top-border-data-word1">Monthly Cumulative fuel consumption </p></div>
+                <div class="top-border-data-word2">{{ fuelConsumptionHeavy
+                  }}L<span style="font-size:0.4vmax;">(重型车 Heavy duty)</span>
+                </div>
+                <div class="top-border-data-word3"
+                     :class="{'colorRed':consumptionRingHeavy>=0,'colorGreen':consumptionRingHeavy<0}">
+                  环比 Monthly rise　{{ consumptionRingHeavyShow
+                  }}%　　<img v-if="consumptionRingHeavy<0" src="img/downArrow.png" height="2%" width="4%"/><img
+                  v-if="consumptionRingHeavy>=0" src="img/upArrow.png" height="2%" width="4%"/>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div class="top-border-data-word"><p>本月驾驶行为综合评分</p>
+                  <p class="top-border-data-word1">Monthly Average scores of driving behaviors</p></div>
+                <div class="top-border-data-word2">{{ overallRatingHeavy
+                  }}分<span style="font-size:0.4vmax;">(重型车 Heavy duty)</span>
+                </div>
+                <div class="top-border-data-word3"
+                     :class="{'colorRed':ratingRingHeavy>=0,'colorGreen':ratingRingHeavy<0}">
+                  环比 Monthly rise　{{ ratingRingHeavyShow
+                  }}%　　<img v-if="ratingRingHeavy<0" src="img/downArrow.png" height="2%" width="4%"/><img
+                  v-if="ratingRingHeavy>=0" src="img/upArrow.png" height="2%" width="4%"/>
+                </div>
+              </el-col>
+            </el-row>
+            <el-row class="top-border-dataTwo">
+              <el-col :span="12">
+                <div style="font-size: 200%;font-weight: bold;color: rgba(74,74,74,1)">{{ fuelConsumptionLightweight
+                  }}L<span style="font-size:0.4vmax;">(轻型车 Light duty)</span>
+                </div>
+                <div class="top-border-data-word3"
+                     :class="{'colorRed':consumptionRingLightweight>=0,'colorGreen':consumptionRingLightweight<0}">
+                  环比 Monthly rise　{{ consumptionRingLightweightShow
+                  }}%　　<img v-if="consumptionRingLightweight<0" src="img/downArrow.png" height="8" width="14"/><img
+                  v-if="consumptionRingLightweight>=0" src="img/upArrow.png" height="8" width="14"/>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div style="font-size: 200%;font-weight: bold;color: rgba(74,74,74,1)">{{ overallRatingLightweight
+                  }}分<span style="font-size:0.4vmax">(轻型车 Light duty)</span>
+                </div>
+                <div class="top-border-data-word3"
+                     :class="{'colorRed':ratingRingLightweight>=0,'colorGreen':ratingRingLightweight<0}">
+                  环比 Monthly rise　{{ ratingRingLightweightShow
+                  }}%　　<img v-if="ratingRingLightweight<0" src="img/downArrow.png" height="8" width="14"/><img
+                  v-if="ratingRingLightweight>=0" src="img/upArrow.png" height="8" width="14"/>
+                </div>
+              </el-col>
+            </el-row>
+            <div id="top-border-echarts"></div>
+            <div id="top-border-echarts2"></div>
+          </el-col>
+        </el-row>
+      </div>
+      <!--    车队油耗分析页面    -->
+      <div class="second" :class="{'main-clicked':mainClick1}">
+        <el-carousel style="height: 100%;width: 95%;margin-left: 2.5%" :autoplay="false" arrow="always" ref="carousel" @change="changeCarousel">
+          <el-carousel-item style="height: 100%">
+            <div class="report-carTeam">
+              <div class="report-1">
+                <el-row style="height: 100%">
+                  <el-col :span="9" class="report-1-carTeam">
+                    <span style="padding-left: 2%">{{ fleetName }}</span>
+                    <el-row>
+                      <el-col :span="10" class="report-1-img">
+                        <img src="img/CAMCMixer.png" height="70%" width="70%"/>
+                      </el-col>
+                      <el-col :span="14" class="report-1-word">
+                        <p>
+                          <span>-车队名称 Fleet name：</span><span class="report-1-words">{{ fleetName }}</span>
+                        </p>
+                        <p>
+                          <span>-车辆类型 Vehicle tyspane：</span><span class="report-1-words">{{ vehicleType }}</span>
+                        </p>
+                        <p>
+                          <span>-车辆信息 Vehicle info:</span><span class="report-1-words">{{ vehicleInfos }}</span>
+                        </p>
+                        <p>
+                          <span>-车辆总数 Total vehicle：</span><span class="report-1-words">{{ carNumber }}</span>
+                        </p>
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                  <el-col :span="15" style="height: 100%">
+                    <el-row style="height: 100%">
+                      <el-col :span="14" class="report-1-Behavior">
+                        <p style="font-size: 1vmax">车队数据分析月报-油耗与驾驶行为</p>
+                        <p>Monthly report of Fleet Data Analysis -Fuel Consumption & Driving Behavior</p>
+                      </el-col>
+                      <el-col :span="4" class="report-1-online">
+                        <span>{{ nowCarCount }}/{{ nowCarCount }} <br> 出勤 Online</span>
+                      </el-col>
+                      <el-col :span="4" class="report-1-online">
+                        <span>{{carDate}}月<br> Month</span>
+                      </el-col>
+                      <el-col :span="24" style="height: 68%;">
+                        <el-row style="height: 92%;">
+                          <el-col :span="5" class="report-1-mileaqe">
+                            <el-row style="height: 100%">
+                              <el-col :span="8" class="report-1-mileaqe-img">
+                                <img src="img/mileage.svg" height="40%" width="90%" style="margin-top: 50%"/></el-col>
+                              <el-col :span="15" class="report-1-mileaqe-word">
+                                <div class="report-1-mileaqe-word1">总里程</div>
+                                <div class="report-1-mileaqe-word2">Total mileage</div>
+                                <div class="report-1-mileaqe-word1">{{allMileage}}</div>
+                                <div class="report-1-mileaqe-word2">km</div>
+                              </el-col>
+                            </el-row>
+                          </el-col>
+                          <el-col :span="5" class="report-1-runtime">
+                            <el-row style="height: 100%">
+                              <el-col :span="8" class="report-1-mileaqe-img">
+                                <img src="img/runningtime.svg" height="40%" width="90%" style="margin-top: 50%"/>
+                              </el-col>
+                              <el-col :span="15" class="report-1-mileaqe-word">
+                                <div class="report-1-runtime-word1">总时间</div>
+                                <div class="report-1-runtime-word2">Total runtime</div>
+                                <div class="report-1-runtime-word1">{{totalTime}}</div>
+                                <div class="report-1-runtime-word2" style="margin-top: 1vh">怠速时间： 294 h</div>
+                              </el-col>
+                            </el-row>
+                          </el-col>
+                          <el-col :span="5" class="report-1-fuel">
+                            <el-row style="height: 100%">
+                              <el-col :span="8" class="report-1-mileaqe-img">
+                                <img src="img/fc.svg" height="40%" width="90%" style="margin-top: 50%"/></el-col>
+                              <el-col :span="15" class="report-1-mileaqe-word">
+                                <div class="report-1-fuel-word1">总油耗</div>
+                                <div class="report-1-fuel-word2">Total fuel</div>
+                                <div class="report-1-fuel-word1">{{totalFuel}} L</div>
+                                <div class="report-1-fuel-word2" style="margin-top: 1vh">怠速油耗： 387 L</div>
+                              </el-col>
+                            </el-row>
+                          </el-col>
+                          <el-col :span="5" class="report-1-cost">
+                            <el-row style="height: 100%">
+                              <el-col :span="8" class="report-1-mileaqe-img">
+                                <img src="img/fccost.svg" height="40%" width="90%" style="margin-top: 50%"/></el-col>
+                              <el-col :span="15" class="report-1-mileaqe-word">
+                                <div class="report-1-word-word1">总油费</div>
+                                <div class="report-1-word-word2">Total fuel cost</div>
+                                <div class="report-1-word-word1">{{ totalFuelCost }}
+                                </div>
+                                <div class="report-1-word-word2" style="margin-top: 1vh">6.5 RMB/L
+                                  RMB
+                                </div>
+                              </el-col>
+                            </el-row>
+                          </el-col>
+                        </el-row>
+                      </el-col>
+                    </el-row>
+
+                  </el-col>
+
+                </el-row>
+              </div>
+              <div class="report-2">
+                <span style="margin-left: 9vmax">运行排名 Driving ranking</span>
+                <span style="margin-left: 40vmax">油耗排名 Fuel consumption ranking</span>
+                <span style="margin-left: 67.5vmax">安全排名 Safety ranking</span>
+                <img src="img/title.png" height="10%" width="100%"/>
+                <el-row style="height: 90%">
+                  <el-col :span="3" class="report-2-eharts" id="report-2-eharts1">
+
+                  </el-col>
+                  <el-col :span="3" class="report-2-eharts" id="report-2-eharts2">
+
+                  </el-col>
+                  <el-col :span="3" class="report-2-eharts" id="report-2-eharts3">
+
+                  </el-col>
+                  <el-col :span="3" class="report-2-eharts" id="report-2-eharts4">
+
+                  </el-col>
+                  <el-col :span="3" class="report-2-eharts" id="report-2-eharts5">
+
+                  </el-col>
+                  <el-col :span="3" class="report-2-eharts" id="report-2-eharts6">
+
+                  </el-col>
+                  <el-col :span="4" class="report-2-eharts" id="report-2-eharts7">
+
+                  </el-col>
+
+                </el-row>
+              </div>
+              <div class="report-3">
+                <el-row style="height: 100%">
+                  <el-col :span="3" class="report-3-imgWord" style="text-align: center">
+                    <img src="img/jianyi.png" height="50%" width="25%"/>
+                  </el-col>
+                  <el-col :span="18" class="report-3-Word">
+                    <p>{{suggestion}}</p>
+                  </el-col>
+                  <el-col :span="3" class="report-3-img">
+                    <img src="img/logo.png" height="40%" width="100%"/>
+                  </el-col>
+                </el-row>
+              </div>
+            </div>
+          </el-carousel-item>
+          <el-carousel-item v-for="(car,carIndex) of carData" :key="carIndex"
+                            style="height: 100%;background-color: white">
+            <div class="report-carTeam-car">
+              <div class="report-car-1">
+                <el-row style="height: 100%">
+                  <el-col :span="8" class="report-1-carTeam">
+                    <span style="padding-left: 2%">{{ fleetName }}</span>
+                  </el-col>
+                  <el-col :span="16" style="height: 100%">
+                    <el-row style="height: 100%">
+                      <el-col :span="14" class="report-car-1-behavior">
+                        <p style="font-size: 1vmax">车队数据分析月报-油耗与驾驶行为</p>
+                        <p>Monthly report of Fleet Data Analysis -Fuel Consumption & Driving Behavior</p>
+                      </el-col>
+                      <el-col :span="4" class="report-car-1-online">
+                        <span>节油/ECO Driving</span>
+                      </el-col>
+                      <el-col :span="4" class="report-car-1-online">
+
+                        <el-select v-model="everyTeamCarValue" placeholder="请选择" @change="changeCarTeams"
+                                   class="everyCarTeamClass">
+                          <el-option
+                            v-for="item in everyTeamCar"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          >
+                          </el-option>
+                        </el-select>
+                        <p>车名 Veh.name</p>
+
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                </el-row>
+              </div>
+              <el-row class="report-car-content">
+                <el-col :span="8" class="report-car-content-left">
+                  <div class="report-car-content-left-evaluate">
+                    总评 Overview score
+                  </div>
+                  <div class="report-car-content-left-evaluate-all">
+                    <el-row class="report-car-content-left-evaluate-out" style="width: 100%">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        急加速比 Fast acc.
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value1[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                    <el-row class="report-car-content-left-evaluate-out">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        怠速比 Low idle
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value2[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                    <el-row class="report-car-content-left-evaluate-out">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        轻踩刹车 Slight brk
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value3[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                    <el-row class="report-car-content-left-evaluate-out">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        重踩刹车 Heavy brk
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value4[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                    <el-row class="report-car-content-left-evaluate-out">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        最佳水温 Best temp
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value5[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                    <el-row class="report-car-content-left-evaluate-out">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        最佳档位 Best gear
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value6[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                    <el-row class="report-car-content-left-evaluate-out">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        经济区运行 Best ECO
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value7[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                    <el-row class="report-car-content-left-evaluate-out">
+                      <el-col :span="12" class="report-car-content-left-evaluate-name">
+                        稳速行驶 Stable run
+                      </el-col>
+                      <el-col :span="12">
+                        <el-rate
+                          v-model="value8[carIndex]"
+                          disabled
+                          text-color="#ff9900"
+                        >
+                        </el-rate>
+                      </el-col>
+                    </el-row>
+                  </div>
+
+                  <div class="report-car-content-left-evaluate">
+                    优化建议 Suggestion
+                  </div>
+                  <div class="report-car-content-left-suggestion">
+                    <div v-for="(suggestion,suggestionIndex) of carSuggestion[carIndex] " :key="suggestionIndex">
+                      --{{ suggestion }}
+                    </div>
+                  </div>
+                  <!-- /.suggestion -->
+                </el-col>
+                <el-col :span="16" class="report-car-content-right">
+                  <div class="report-car-content-right-evaluate">
+                    驾驶性分析 Driving behavior
+                  </div>
+                  <div class="report-car-content-right-ecarts">
+                    <el-row type="flex" :gutter="10" class="report-car-content-right-ecarts-elrow">
+                      <el-col :span="5" class="report-car-content-right-ecarts-elcol" v-for="(attr,attrIndex) of 11"
+                              :key="attrIndex" :ref=`attr-${carIndex}-${attrIndex}`></el-col>
+                    </el-row>
+                  </div>
+                </el-col>
+              </el-row>
+            </div>
+          </el-carousel-item>
+          <!--    车队安全echarts界面        -->
+          <el-carousel-item style="height: 100%">
+            <div class="report-safe">
+              <div class="report-1-safe">
+                <el-row style="height: 100%">
+                  <el-col :span="8" class="report-1-carTeam">
+                    <span style="padding-left: 2%">{{fleetName}}</span>
+                  </el-col>
+                  <el-col :span="16" style="height: 100%">
+                    <el-row style="height: 100%">
+                      <el-col :span="18" class="report-1-safe-behavior">
+                        <p style="font-size: 1vmax">车队数据分析月报-油耗与驾驶行为</p>
+                        <p>Monthly report of Fleet Data Analysis -Fuel Consumption & Driving Behavior</p>
+                      </el-col>
+                      <el-col :span="5" class="report-1-safe-online">
+                        <span>安全/Safety Driving</span>
+                      </el-col>
+                    </el-row>
+                  </el-col>
+                </el-row>
+              </div>
+              <div class="report-2-safe">
+                <el-row style="height: 100%">
+                  <el-col :span="11" class="report-2-safe-eharts">
+                    <el-row style="height: 100%">
+                      <div>发动机超转速时间占比/ Engine over speed percentage（超转速超过2000rpm）</div>
+                      <el-row style="height: 90%">
+                        <el-col :span="10" id="report-2-safe-eharts1" style="height: 100%;width: 40%">
+
+                        </el-col>
+                        <el-col :span="14" class="report-2-safe-eharts-word">
+                          {{enginOverSpeedSuggestion}}
+                        </el-col>
+                      </el-row>
+                    </el-row>
+
+
+                  </el-col>
+                  <el-col :span="11" class="report-2-safe-eharts">
+                    <el-row style="height: 100%">
+                      <div>空挡滑行时间占比/ Coasting percentage</div>
+                      <el-row style="height: 90%">
+                        <el-col :span="10" id="report-2-safe-eharts2" style="height: 100%;width: 40%">
+
+                        </el-col>
+                        <el-col :span="14" class="report-2-safe-eharts-word">
+                          {{coastingPercentSuggestion}}
+                        </el-col>
+                      </el-row>
+                    </el-row>
+                  </el-col>
+                  <el-col :span="11" class="report-2-safe-eharts">
+                    <el-row style="height: 100%">
+                      <div>车辆超速时间占比/ Vehicle over speed percentage（超速：超过80km/h）</div>
+                      <el-row style="height: 90%">
+                        <el-col :span="10" id="report-2-safe-eharts3" style="height: 100%;width: 40%">
+
+                        </el-col>
+                        <el-col :span="14" class="report-2-safe-eharts-word">
+                          {{OverSpeed}}
+                        </el-col>
+                      </el-row>
+                    </el-row>
+                  </el-col>
+                  <el-col :span="11" class="report-2-safe-eharts" id="report-2-safe-eharts4">
+
+                  </el-col>
+
+                </el-row>
+              </div>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+      <!--   动力总成健康管理页面     -->
+      <div class="third" :class="{'main-clicked':mainClick3}"><img src="img/fullCar.png" height="100%" width="100%"/>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- /#main -->
+<!--底部图片-->
+<img src="img/bottom.png" height="15" width="100%"/>
+</div>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/signalingConfig.js"></script>
+
+<script src="js/signaling.js"></script>
+<script src="js/axios.min.js"></script>
+<!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
+<script src="js/vue.min.js"></script>
+<script src="js/index.js"></script>
+<script src="js/echarts.min.js"></script>
+<script type="text/javascript">
+  var main = new Vue({
+    el: '#main',
+    data: {
+        one:false,
+        two:true,
+      //视频地址
+      videoData: [],
+      twoVideoData:[],
+      nowCarCount: '',
+      //控制跑马灯默认显示
+      carouselIndex: 0,
+      //上方三个按钮显示控制
+      wrapShow: false,
+      //上一个月
+      carDate: null,
+      // 地图echartsdom
+      mapChartview: "",
+      //车队车辆信息echartsdom
+      reportEchartsview: "",
+      //车队首页第一个echartsdom
+      carTeamEcharts1view: "",
+      //车队首页第二个echartsdom
+      carTeamEcharts2view: "",
+      //车队首页第三个echartsdom
+      carTeamEcharts3view: "",
+      //车队首页第四个echartsdom
+      carTeamEcharts4view: "",
+      //车队首页第五个echartsdom
+      carTeamEcharts5view: "",
+      //车队首页第六个echartsdom
+      carTeamEcharts6view: "",
+      //车队首页第七个echartsdom
+      carTeamEcharts7view: "",
+      //车队安全第一个echartsdom
+      carTeamSafeEcharts1view: "",
+      //车队安全第一个echartsdom
+      carTeamSafeEcharts2view: "",
+      //车队安全第一个echartsdom
+      carTeamSafeEcharts3view: "",
+      //车队名
+      fleet: '',
+      //当前所有车队
+      carList: [],
+      //控制弹出框显示
+      drawer: false,
+      //控制弹出框显示方向
+      direction: 'ltr',
+      //控制车队油耗样式展示
+      isActive: false,
+      //动力总成预防性维护样式展示
+      isActive1: false,
+      //动力总成健康管理样式展示
+      isActive2: false,
+      //控制车队油耗页面展示
+      mainClick1: true,
+      //动力总成预防性维护页面展示
+      mainClick2: true,
+      //动力总成健康管理页面展示
+      mainClick3: true,
+      //页面展示总控制
+      TCOClick: false,
+      //video展示页面控制
+      videoClick: true,
+      //主页面video展示页面控制
+      showVideoClick: false,
+
+      //report 车辆循环数据
+      //车名
+      carName: [],
+      //车辆建议
+      carSuggestion: [],
+      //车辆总数
+      carNumber: null,
+      //每一个车队中车名字
+      everyTeamCar: [],
+      everyTeamCarValue: "",
+      value1: [],
+      value2: [],
+      value3: [],
+      value4: [],
+      value5: [],
+      value6: [],
+      value7: [],
+      value8: [],
+      carData: [],
+      beastEcoRatioPlate: [],
+      beastEcoRatioValue: [],
+      beatGearRatioPlate: [],
+      beatGearRatioValue: [],
+      bestTempRatioPlate: [],
+      bestTempRatioValue: [],
+      fastAccPlate: [],
+      fastAccValue: [],
+      heaveyBrkRatioPlate: [],
+      heaveyBrkRatioValue: [],
+      lowIdleRatioPlate: [],
+      lowIdleRatioValue: [],
+      rpmPlate: [],
+      rpmValue: [],
+      slightBrkRatioPlate: [],
+      slightBrkRatioValue: [],
+      speedPlate: [],
+      speedValue: [],
+      stabelRunRatioPlate: [],
+      stabelRunRatioValue: [],
+      torquePlate: [],
+      torqueValue: [],
+
+      //车队油耗分析报告右侧echarts图数据
+      heavyTime: [],
+      lightTime: [],
+      heavyValue: [],
+      lightValue: [],
+
+      //地图页面数据
+      mapData: [],
+      runningNumber: "",//当前运行车辆数
+      runningTime: "",//当月累计运行时间
+      cumulativeMileage: "",//当月累计运行里程
+      fuelConsumptionHeavy: "",//本月累计燃油消耗（重型）
+      consumptionRingHeavy: "",//本月累计燃油消耗环比上月（重型）
+      consumptionRingHeavyShow: "",//本月累计燃油消耗环比上月（重型）展示
+      fuelConsumptionLightweight: "",//本月累计燃油消耗（轻型）
+      consumptionRingLightweight: "",//本月累计燃油消耗环比上月（轻型）
+      consumptionRingLightweightShow: "",//本月累计燃油消耗环比上月（轻型）展示
+      overallRatingHeavy: "",//本月驾驶行为综合评分（重型）
+      ratingRingHeavy: "",//本月驾驶行为综合评分环比上月（重型)
+      ratingRingHeavyShow: "",//本月驾驶行为综合评分环比上月（重型)展示
+      overallRatingLightweight: "",//本月驾驶行为综合评分（轻型）
+      ratingRingLightweight: "",//本月驾驶行为综合评分环比上月（轻型）
+      ratingRingLightweightShow: "",//本月驾驶行为综合评分环比上月（轻型）展示,
+
+      allMileage: "",//总里程
+      fleetName: "",//车队名称
+      id: "",//车队id
+      suggestion: "",//建议
+      totalFuel: "",//总费油
+      totalFuelCost: "",//总油费
+      totalTime: "",//运行总里程
+      vehicleInfos: "",//车队信息
+      vehicleType: "",//车辆信息
+
+      //echarts数据
+      safePlateList: [],//驾驶不安全ehcarts
+      attendanceList: [],//echarts 出勤数据
+      coastingList: [],//空挡滑行
+      engineOverSpeedList: [],//引擎超速
+      fuelConsList: [],//百公里油耗
+      fuelCostList: [],//总油耗
+      mileageList: [],//总里程
+      plateList: [],//车牌
+      runTimeList: [],//运行时间
+      vehicleOverSpeedList: [],//超速次数
+      fuelConsumptionRatioList: [],//单位扭矩百公里油耗
+
+
+      //安全echarts数据
+      coastingPercentPlate: [],
+      coastingPercentValue: [],
+      enginOverSpeedPercentPlate: [],
+      enginOverSpeedPercentValue: [],
+      overSpeedPercentPlate: [],
+      overSpeedPercentValue: [],
+      OverSpeed: "",
+      coastingPercentSuggestion: "",
+      enginOverSpeedSuggestion: "",
+      firstClick: true,
+      fuelClick: true,
+      powerClick: true,
+    },
+    watch: {
+      videoData(val) {
+        this.$nextTick(() => {
+          let video = [];
+          for (let i in this.videoData) {
+            video.push(this.$refs['video-' + i][0])
+          }
+
+          for (let videoElement of video) {
+            videoElement.addEventListener('play', function () {
+              videoElement.webkitRequestFullScreen();
+            });
+          }
+        })
+
+      },
+      twoVideoData(val) {
+        this.$nextTick(() => {
+          let video = [];
+          for (let i in this.twoVideoData) {
+            video.push(this.$refs['twoVideo-' + i][0])
+          }
+
+          for (let videoElement of video) {
+            videoElement.addEventListener('play', function () {
+              videoElement.webkitRequestFullScreen();
+            });
+          }
+        })
+
+      }
+
+    },
+    methods: {
+      //全屏方法
+      drawerControl() {
+        this.drawer = true;
+        // window.onload = function () {
+        // let requestFullScreen = ['requestFullscreen', 'mozRequestFullscreen', 'webkitRequestFullscreen', 'msRequestFullscreen'].find(f => f in document.body);
+        //
+        // document.body[requestFullScreen]();
+        // }
+      },
+
+
+      //弹出框内vido展示点击事件
+      handVideoClick() {
+        this.setActiveItem();
+        this.wrapShow = false;
+        this.showVideoClick = true;
+        this.TCOClick = false;
+        this.videoClick = false;
+        this.isActive = false;
+        this.isActive1 = false;
+        this.isActive2 = false;
+        this.mainClick1 = true;
+        this.mainClick2 = true;
+        this.mainClick3 = true;
+      },
+      //首页（在线动力总成专家）点击事件
+      handShowVideoClick() {
+        this.setActiveItem();
+        this.wrapShow = false;
+        this.showVideoClick = false;
+        this.TCOClick = false;
+        this.videoClick = true;
+        this.isActive = false;
+        this.isActive1 = false;
+        this.isActive2 = false;
+        this.mainClick1 = true;
+        this.mainClick2 = true;
+        this.mainClick3 = true;
+      },
+      //车辆全生命周期用车成本优化点击事件
+      handTCOClick() {
+        this.setActiveItem();
+        this.wrapShow = true;
+        this.showVideoClick = true;
+        this.TCOClick = false;
+        this.videoClick = true;
+        this.isActive = false;
+        this.isActive1 = false;
+        this.isActive2 = false;
+        this.mainClick1 = true;
+        this.mainClick2 = false;
+        this.mainClick3 = true;
+        //在点击时才加载echarts
+        if (this.powerClick) {
+          this.$nextTick(() => {
+            this.drawMap();
+            this.myEcharts();
+            this.myEcharts2();
+          });
+        }
+        this.powerClick = false;
+      },
+      setActiveItem() {
+        this.$refs.carousel.setActiveItem(0)
+      },
+      carSetActiveItem(index) {
+        this.$refs.carousel.setActiveItem(index + 2)
+      },
+      //车队油耗分析报告点击事件
+      handleClick() {
+        this.setActiveItem();
+        this.carouselIndex = 0;
+        this.showVideoClick = true;
+        this.isActive = true;
+        this.isActive1 = false;
+        this.isActive2 = false;
+        this.mainClick1 = false;
+        this.mainClick2 = true;
+        this.mainClick3 = true;
+        this.videoClick = true;
+        if (this.firstClick) {
+          this.getData().then(() => {
+            this.$nextTick(() => {
+              this.carTeamEcharts1();
+              this.carTeamEcharts2();
+              this.carTeamEcharts3();
+              this.carTeamEcharts4();
+              this.carTeamEcharts5();
+              this.carTeamEcharts6();
+              this.carTeamEcharts7();
+              this.carTeamSafeEcharts1();
+              this.carTeamSafeEcharts2();
+              this.carTeamSafeEcharts3();
+              for (let carIndex = 0; carIndex <= this.carData.length - 1; carIndex++) {
+                for (let attrIndex = 0; attrIndex <= 10; attrIndex++) {
+                  let dom = this.$refs[`attr-${carIndex}-${attrIndex}`][0].$el;
+                  switch (attrIndex) {
+                    case 0:
+                      this.reportEcharts('急加速比 Fast acc.ratio (%)', dom, this.fastAccPlate[carIndex], this.fastAccValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 1:
+                      this.reportEcharts('怠速比 Low idle ratio (%)', dom, this.lowIdleRatioPlate[carIndex], this.lowIdleRatioValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 2:
+                      this.reportEcharts('轻踩刹车比 Slight brk ratio (%)', dom, this.slightBrkRatioPlate[carIndex], this.slightBrkRatioValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 3:
+                      this.reportEcharts('重踩刹车 Heavy brk ratio (%)', dom, this.heaveyBrkRatioPlate[carIndex], this.heaveyBrkRatioValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 4:
+                      this.reportEcharts('最佳水温比 Best temp.ratio (%)', dom, this.bestTempRatioPlate[carIndex], this.bestTempRatioValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 5:
+                      this.reportEcharts('最佳档位比 Best gear ratio (%)', dom, this.beatGearRatioPlate[carIndex], this.beatGearRatioValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 6:
+                      this.reportEcharts('经济区运行比 \nBest ECO ratio (%)', dom, this.beastEcoRatioPlate[carIndex], this.beastEcoRatioValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 7:
+                      this.reportEcharts('稳速行驶 Stable run ratio (%)', dom, this.stabelRunRatioPlate[carIndex], this.stabelRunRatioValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 8:
+                      this.reportEcharts('平均转速 Avg engine speed', dom, this.rpmPlate[carIndex], this.rpmValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 9:
+                      this.reportEcharts('平均扭矩百分比 \nAvg.percentage torque (%)', dom, this.torquePlate[carIndex], this.torqueValue[carIndex], this.carName[carIndex]);
+                      break;
+                    case 10:
+                      this.reportEcharts('平均车速 Avg.speed (km/h)', dom, this.speedPlate[carIndex], this.speedValue[carIndex], this.carName[carIndex]);
+                      break;
+                    default:
+                      break;
+                  }
+                }
+              }
+
+            });
+          });
+        }
+        this.firstClick = false;
+
+        // //在点击时才加载echarts
+        // if ( this.fuelClick ) {
+        //     this.getData().then( () => {
+        //         console.log( this.value1[ 0 ], this.value2[ 0 ], this.value3[ 0 ] )
+        //
+        //         this.$nextTick( () => {
+        //             this.carTeamEcharts1();
+        //             this.carTeamEcharts2();
+        //             this.carTeamEcharts3();
+        //             this.carTeamEcharts4();
+        //             this.carTeamEcharts5();
+        //             this.carTeamEcharts6();
+        //             this.carTeamEcharts7();
+        //             this.carTeamSafeEcharts1();
+        //             this.carTeamSafeEcharts2();
+        //             this.carTeamSafeEcharts3();
+        //             for ( let carIndex = 0; carIndex <= this.carData.length - 1; carIndex++ ) {
+        //                 for ( let attrIndex = 0; attrIndex <= 10; attrIndex++ ) {
+        //                     let dom = this.$refs[ `attr-${ carIndex }-${ attrIndex }` ][ 0 ].$el;
+        //                     switch ( attrIndex ) {
+        //                         case 0:
+        //                             this.reportEcharts( '急加速比 Fast acc.ratio (%)', dom, this.fastAccPlate[ carIndex ], this.fastAccValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 1:
+        //                             this.reportEcharts( '怠速比 Low idle ratio (%)', dom, this.lowIdleRatioPlate[ carIndex ], this.lowIdleRatioValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 2:
+        //                             this.reportEcharts( '轻踩刹车比 Slight brk ratio (%)', dom, this.slightBrkRatioPlate[ carIndex ], this.slightBrkRatioValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 3:
+        //                             this.reportEcharts( '重踩刹车 Heavy brk ratio (%)', dom, this.heaveyBrkRatioPlate[ carIndex ], this.heaveyBrkRatioValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 4:
+        //                             this.reportEcharts( '最佳水温比 Best temp.ratio (%)', dom, this.bestTempRatioPlate[ carIndex ], this.bestTempRatioValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 5:
+        //                             this.reportEcharts( '最佳档位比 Best gear ratio (%)', dom, this.beatGearRatioPlate[ carIndex ], this.beatGearRatioValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 6:
+        //                             this.reportEcharts( '经济区运行比 Best ECO ratio (%)', dom, this.beastEcoRatioPlate[ carIndex ], this.beastEcoRatioValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 7:
+        //                             this.reportEcharts( '稳速行驶 Stable run ratio', dom, this.stabelRunRatioPlate[ carIndex ], this.stabelRunRatioValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 8:
+        //                             this.reportEcharts( '平均转速 Avg engine speed (%)', dom, this.rpmPlate[ carIndex ], this.rpmValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         case 9:
+        //                             this.reportEcharts( '平均扭矩百分比', dom, this.torquePlate[ carIndex ], this.torqueValue[ carIndex ], this.carName[ carIndex ], 'Avg.percentage torque (%)' );
+        //                             break;
+        //                         case 10:
+        //                             this.reportEcharts( '平均车速 Avg.speed (km/h)', dom, this.speedPlate[ carIndex ], this.speedValue[ carIndex ], this.carName[ carIndex ] );
+        //                             break;
+        //                         default:
+        //                             break;
+        //                     }
+        //                 }
+        //             }
+        //
+        //         } );
+        //     } );
+        //
+        // }
+        // this.fuelClick = false;
+      },
+      //动力总成预防性维护点击事件
+      handleClick1() {
+        this.setActiveItem();
+        this.showVideoClick = true;
+        this.isActive = false;
+        this.isActive1 = true;
+        this.isActive2 = false;
+        this.mainClick1 = true;
+        this.mainClick2 = true;
+        this.mainClick3 = false;
+        this.videoClick = true;
+
+
+      },
+      //动力总成健康管理点击事件
+      handleClick2() {
+        this.setActiveItem();
+        this.showVideoClick = true;
+        this.isActive = false;
+        this.isActive1 = false;
+        this.isActive2 = true;
+        this.mainClick1 = true;
+        this.mainClick2 = false;
+        this.mainClick3 = true;
+        this.videoClick = true;
+      },
+      changeCarTeams(value) {
+        this.carSetActiveItem(value)
+      },
+      changeCarTeams( value ) {
+        this.carSetActiveItem( value );
+        this.changeCarousel();
+      },
+      changeCarousel(value){
+        this.everyTeamCarValue=this.everyTeamCar[value-2].label;
+      },
+      //切换车队事件
+      changeCarTeam() {
+        this.setActiveItem();
+        this.getData().then(() => {
+          for (let carIndex = 0; carIndex <= this.carData.length-1; carIndex++) {
+            for (let attrIndex = 0; attrIndex <= 10; attrIndex++) {
+              let dom = this.$refs[`attr-${carIndex}-${attrIndex}`][0].$el;
+              switch (attrIndex) {
+                case 0:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 1:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 2:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 3:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 4:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 5:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 6:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 7:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 8:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 9:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                case 10:
+                  this.reportEcharts('', dom, [], [], []);
+                  break;
+                default:
+                  break;
+              }
+            }
+          }
+          this.carTeamEcharts1view.clear();
+          this.carTeamEcharts2view.clear();
+          this.carTeamEcharts3view.clear();
+          this.carTeamEcharts4view.clear();
+          this.carTeamEcharts5view.clear();
+          this.carTeamEcharts6view.clear();
+          this.carTeamEcharts7view.clear();
+          this.carTeamSafeEcharts1view.clear();
+          this.carTeamSafeEcharts2view.clear();
+          this.carTeamSafeEcharts3view.clear();
+          this.carTeamEcharts1();
+          this.carTeamEcharts2();
+          this.carTeamEcharts3();
+          this.carTeamEcharts4();
+          this.carTeamEcharts5();
+          this.carTeamEcharts6();
+          this.carTeamEcharts7();
+          this.carTeamSafeEcharts1();
+          this.carTeamSafeEcharts2();
+          this.carTeamSafeEcharts3();
+          if (this.carData[0].fleet !== "") {
+            for (let carIndex = 0; carIndex <= this.carData.length - 1; carIndex++) {
+              for (let attrIndex = 0; attrIndex <= 10; attrIndex++) {
+                let dom = this.$refs[`attr-${carIndex}-${attrIndex}`][0].$el;
+                switch (attrIndex) {
+                  case 0:
+                    this.reportEcharts('急加速比 Fast acc.ratio (%)', dom, this.fastAccPlate[carIndex], this.fastAccValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 1:
+                    this.reportEcharts('怠速比 Low idle ratio (%)', dom, this.lowIdleRatioPlate[carIndex], this.lowIdleRatioValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 2:
+                    this.reportEcharts('轻踩刹车比 Slight brk ratio (%)', dom, this.slightBrkRatioPlate[carIndex], this.slightBrkRatioValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 3:
+                    this.reportEcharts('重踩刹车 Heavy brk ratio (%)', dom, this.heaveyBrkRatioPlate[carIndex], this.heaveyBrkRatioValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 4:
+                    this.reportEcharts('最佳水温比 Best temp.ratio (%)', dom, this.bestTempRatioPlate[carIndex], this.bestTempRatioValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 5:
+                    this.reportEcharts('最佳档位比 Best gear ratio (%)', dom, this.beatGearRatioPlate[carIndex], this.beatGearRatioValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 6:
+                    this.reportEcharts('经济区运行比 Best ECO ratio (%)', dom, this.beastEcoRatioPlate[carIndex], this.beastEcoRatioValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 7:
+                    this.reportEcharts('稳速行驶 Stable run ratio', dom, this.stabelRunRatioPlate[carIndex], this.stabelRunRatioValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 8:
+                    this.reportEcharts('平均转速 Avg engine speed (%)', dom, this.rpmPlate[carIndex], this.rpmValue[carIndex], this.carName[carIndex]);
+                    break;
+                  case 9:
+                    this.reportEcharts('平均扭矩百分比', dom, this.torquePlate[carIndex], this.torqueValue[carIndex], this.carName[carIndex], 'Avg.percentage torque (%)');
+                    break;
+                  case 10:
+                    this.reportEcharts('平均车速 Avg.speed (km/h)', dom, this.speedPlate[carIndex], this.speedValue[carIndex], this.carName[carIndex]);
+                    break;
+                  default:
+                    break;
+                }
+              }
+            }
+          }
+        });
+      },
+      //获取动力总成预防性维护页面内数据方法
+      getData() {
+        // let ip = 'http://10.8.172.112:8080';
+        // let ip = 'http://10.0.0.197:8080';
+        // let ip = 'http://192.168.1.11:8082';
+        let ip = 'http://localhost:8080';
+
+        return new Promise(resolve => {
+          Promise.all([
+            axios({
+              url: ip + '/api/fleet/query',
+              params: {
+                fleet: this.fleet
+              }
+            }),
+
+            axios({
+              url: ip + '/api/report',
+              params: {
+                fleet: this.fleet
+              }
+            }),
+
+            axios({
+              url: ip + '/api/report/safe',
+              params: {
+                fleet: this.fleet
+              }
+            })
+
+          ]).then(([res, res1, res2]) => {
+
+            if(res1.data.data==null){
+              this.nowCarCount = 0;
+            }else{
+              this.nowCarCount = res1.data.data.length;
+            }
+
+
+            const data = res.data.data;
+            const echartsData = res.data.data.sortInfo;
+            const echartsData1 = res.data.data.sortInfoUnSafe;
+            this.allMileage = parseInt(data.allMileage);
+            this.fleetName = data.fleetName;
+            this.id = data.id;
+            this.suggestion = data.suggestion;
+            this.totalFuel = parseInt(data.totalFuel);
+            this.totalFuelCost = parseInt(data.totalFuelCost);
+            this.totalTime = parseInt(data.totalTime);
+            this.vehicleInfos = data.vehicleInfos;
+            this.vehicleType = data.vehicleType;
+            this.attendanceList = echartsData.attendanceList;
+            this.coastingList = echartsData1.coastingList;
+            this.engineOverSpeedList = echartsData1.engineOverSpeedList;
+            this.fuelConsList = echartsData.fuelConsList;
+            this.fuelCostList = echartsData.fuelCostList;
+            this.mileageList = echartsData.mileageList;
+            this.plateList = echartsData.plateList;
+            this.safePlateList = echartsData1.plateList;
+            this.runTimeList = echartsData.runTimeList;
+            this.vehicleOverSpeedList = echartsData1.vehicleOverSpeedList;
+            this.fuelConsumptionRatioList = echartsData.fuelConsumptionRatioList;
+
+
+            if(res1.data.data==null){
+              this.carNumber = 0;
+              this.carData = [];
+            }else{
+              this.carData = res1.data.data;
+              this.carNumber = res1.data.data.length;
+              this.everyTeamCar = res1.data.extra;
+              this.everyTeamCarValue = res1.data.extra[0].value;
+              const reportEchartss = res1.data.data;
+              for (let item of reportEchartss) {
+                this.beastEcoRatioPlate.push(item.chart.beastEcoRatio.plate);
+                this.beastEcoRatioValue.push(item.chart.beastEcoRatio.value);
+                this.beatGearRatioPlate.push(item.chart.beatGearRatio.plate);
+                this.beatGearRatioValue.push(item.chart.beatGearRatio.value);
+                this.bestTempRatioPlate.push(item.chart.bestTempRatio.plate);
+                this.bestTempRatioValue.push(item.chart.bestTempRatio.value);
+                this.fastAccPlate.push(item.chart.fastAcc.plate);
+                this.fastAccValue.push(item.chart.fastAcc.value);
+                this.heaveyBrkRatioPlate.push(item.chart.heaveyBrkRatio.plate);
+                this.heaveyBrkRatioValue.push(item.chart.heaveyBrkRatio.value);
+                this.lowIdleRatioPlate.push(item.chart.lowIdleRatio.plate);
+                this.lowIdleRatioValue.push(item.chart.lowIdleRatio.value);
+                this.rpmPlate.push(item.chart.rpm.plate);
+                this.rpmValue.push(item.chart.rpm.value);
+                this.slightBrkRatioPlate.push(item.chart.slightBrkRatio.plate);
+                this.slightBrkRatioValue.push(item.chart.slightBrkRatio.value);
+                this.speedPlate.push(item.chart.speed.plate);
+                this.speedValue.push(item.chart.speed.value);
+                this.stabelRunRatioPlate.push(item.chart.stabelRunRatio.plate);
+                this.stabelRunRatioValue.push(item.chart.stabelRunRatio.value);
+                this.torquePlate.push(item.chart.torque.plate);
+                this.torqueValue.push(item.chart.torque.value);
+                this.value1.push(parseFloat(item.overScore.FastAccRatiostars));
+                this.value2.push(parseFloat(item.overScore.LowIdleRatiostars));
+                this.value3.push(parseFloat(item.overScore.BrkRatiostars));
+                this.value4.push(parseFloat(item.overScore.HeavyBrkRatiostars));
+                this.value5.push(parseFloat(item.overScore.Best_coolantTemRatiostars));
+                this.value6.push(parseFloat(item.overScore.BGRRatiostars));
+                this.value7.push(parseFloat(item.overScore.BestECORatiostars));
+                this.value8.push(parseFloat(item.overScore.StableRunRatiostars));
+                this.carSuggestion.push(item.suggestion);
+                this.carName.push(item.vehiclePlate)
+              }
+            }
+
+            const data1 = res2.data.data;
+            // let obj1={};
+            // let obj2={};
+            // let obj3={};
+            // this.sorts(data1.coastingPercent,data1.coastingPercent,obj1);
+            // this.sorts(data1.enginOverSpeedPercent,data1.enginOverSpeedPercent,obj2);
+            // this.sorts(data1.overSpeedPercent,data1.overSpeedPercent,obj3);
+            this.coastingPercentPlate = data1.coastingPercent.plate;
+            this.coastingPercentValue = data1.coastingPercent.value;
+            this.enginOverSpeedPercentPlate = data1.enginOverSpeedPercent.plate;
+            this.enginOverSpeedPercentValue = data1.enginOverSpeedPercent.value;
+            this.overSpeedPercentPlate = data1.overSpeedPercent.plate;
+            this.overSpeedPercentValue = data1.overSpeedPercent.value;
+            this.OverSpeed = data1.OverSpeed;
+            this.coastingPercentSuggestion = data1.coastingPercentSuggestion;
+            this.enginOverSpeedSuggestion = data1.enginOverSpeedSuggestion;
+            resolve();
+          })
+        });
+      },
+      //对safeecharts表格数据从大到小排序
+      // sorts(value1,value2,objs){
+      //     let obj = [];
+      //     let arr =[];
+      //     let plate =value1.plate;
+      //     let value =  value2.value;
+      //     for (let s in plate){
+      //         obj.push({plate:plate[s],value:value[s]})
+      //     }
+      //     obj.sort((a,b)=>{return a.value-b.value});
+      //     arr.push(obj);
+      //     objs.plate=[];
+      //     objs.value=[];
+      //     for (let i of arr[0]){
+      //         objs.plate.push(i.plate);
+      //         objs.value.push(i.value)
+      //     }
+      // },
+
+      //动力总成预防性维护页面循环创建echarts方法
+      reportEcharts(title, dom, yData, xData, carName, title1) {
+        const that = this;
+        that.reportEchartsview = echarts.init(dom);
+        let y_data = yData,
+          _data1 = xData;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          title: [{
+            text: title,
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 14
+            }
+          },
+            {
+              text: title1,
+              top: '7%',
+              textStyle: {
+                color: '#000',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          grid: {
+            containLabel: true,
+            top: 35,
+            left: 15,
+            right: 0,
+            bottom: 5,
+
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }
+          ],
+          series: [
+            {
+              type: 'bar',
+              name: '',
+              stack: '2',
+              label: _label,
+              barMinHeight: 28,
+              legendHoverLink: false,
+              barWidth: 14,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'rgb(0,140,0)', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  // color: 'rgb(149,149,149)'
+                  color: function (p) {
+                    if (p.name === carName) {
+                      return 'red';
+                    } else {
+                      return 'rgb(149,149,149)';
+                    }
+                  }
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.reportEchartsview.setOption(option);
+      },
+      //地图绘制方法
+      drawMap() {
+        const that = this;
+        that.mapChartview = echarts.init(document.getElementById('main-1'));
+        that.mapChartview.showLoading();
+
+        $.get('100000.json', function (geoJson) {
+
+          that.mapChartview.hideLoading();
+
+          echarts.registerMap('china', geoJson);
+          var myData = that.mapData;
+          var option = {
+            title: {
+              text: '',
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: '{b}<br/>{c} '
+            },
+            // toolbox: {
+            //     show: true,
+            //     orient: 'vertical',
+            //     left: '950',
+            //     top: 'center',
+            //     feature: {
+            //         dataView: { readOnly: false },
+            //         restore: {},
+            //         saveAsImage: {}
+            //     }
+            // },
+            // visualMap: {
+            //   min: 800,
+            //   max: 50000,
+            //   text: [ 'High', 'Low' ],
+            //   realtime: false,
+            //   calculable: true,
+            //   inRange: {
+            //     color: [ 'lightskyblue', 'yellow', 'orangered' ]
+            //   }
+            // },
+            geo: {
+              show: true,
+              map: 'china',
+              label: {
+                normal: {
+                  show: true
+                },
+                emphasis: {
+                  show: true
+                }
+              },
+              //是否支持缩放
+              roam: false,
+              itemStyle: {
+                normal: {
+                  areaColor: 'rgba(220,220,220,0)',
+                  borderColor: '#ccc',
+
+                },
+                emphasis: {
+                  areaColor: 'rgb(162,222,216)'
+                }
+              },
+              zoom: 1.2
+            },
+            // backgroundColor: '#404a59',
+
+            series: [
+
+              {
+                name: '车辆数',
+                type: 'effectScatter',
+                coordinateSystem: 'geo',
+                zlevel: 2,
+                rippleEffect: {
+                  brushType: 'stroke',
+                  period: 7,
+                  scale: 4,
+                },
+                color: "green", //修改标点样式
+                data: myData // series数据内容
+              }
+            ]
+          };
+          that.mapChartview.setOption(option);
+        });
+      },
+      //重型车百公里油耗echarts
+      myEcharts() {
+        // tooltip: {
+        //   show: true,
+        //   backgroundColor: '#fff',
+        //   borderColor: '#ddd',
+        //   borderWidth: 1,
+        //   textStyle: {
+        //     color: '#3c3c3c',
+        //     fontSize: 16
+        //   },
+        //   formatter: function ( p ) {
+        //     let greenimg = `<img style='width:10px;height:10px;' src='./img/oval.png'/>`;
+        //     // idx = p.seriesIndex;//1，2，3
+        //     return greenimg + p.name + ':' + p.value;
+        //   },
+        //   extraCssText: 'box-shadow: 0 0 5px rgba(0, 0, 0, 0.1)'
+        // },
+        const that = this;
+
+        var myChart1 = echarts.init(document.getElementById('top-border-echarts'));
+        let option1 = {
+          title: [{
+            text: '重型车百公里油耗',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 16
+            },
+            formatter: function (p) {
+              let greenimg = `<img style='width:10px;height:10px;' src='./img/oval.png'/>`;
+              return greenimg + p.name + ':' + p.value;
+            },
+          },
+            {
+              text: ' Average fuel consumptions of heavy duty (L/100km)',
+              top: '11%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 12
+              }
+            }
+          ],
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          // toolbox: {
+          //     left: '680',
+          //     feature: {
+          //         saveAsImage: {}
+          //     }
+          // },
+          xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: that.heavyTime,
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(202,202,202)',
+              }
+            },
+            axisLabel: {
+              inside: false,
+              interval: -20,
+              rotate: 0,
+            }
+
+          },
+          yAxis: {
+            type: 'value',
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(202,202,202)',
+              }
+            }
+          },
+          series: [
+            {
+              name: '百公里油耗',
+              type: 'line',
+              stack: '总量',
+              data: that.heavyValue,
+              smooth: true,
+              itemStyle: {
+                normal: {
+                  color: '#8079CB', //改变折线点的颜色
+                  lineStyle: {
+                    color: {
+                      type: 'linear',
+
+                      colorStops: [{
+                        offset: 0,
+                        color: '#DE89C8' // 0% 处的颜色
+                      },
+                        {
+                          offset: 1,
+                          color: '#8079CB' // 100% 处的颜色
+                        }],
+                      globalCoord: false // 缺省为 false
+                    }, //改变折线颜色
+                  }
+                }
+              },
+            },
+
+          ]
+        };
+
+
+        myChart1.setOption(option1);
+      },
+      //轻型车百公里油耗echarts
+      myEcharts2() {
+        const that = this;
+        var myChart2 = echarts.init(document.getElementById('top-border-echarts2'));
+        let option2 = {
+          title: [{
+            text: '轻型车百公里油耗',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 16
+            }
+          },
+            {
+              text: ' Average fuel consumptions of light duty (L/100km)',
+              top: '11%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 12
+              }
+            }
+          ],
+          tooltip: {
+            trigger: 'axis'
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          // toolbox: {
+          //     left: '680',
+          //     feature: {
+          //         saveAsImage: {}
+          //     }
+          // },
+          xAxis: {
+            type: 'category',
+            boundaryGap: true,
+            data: that.heavyTime,
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(202,202,202)',
+              }
+            },
+            axisLabel: {
+              inside: false,
+              interval: -20,
+              rotate: 0,
+            }
+
+          },
+          yAxis: {
+            type: 'value',
+            axisLine: {
+              lineStyle: {
+                color: 'rgb(202,202,202)',
+              }
+            }
+          },
+          series: [
+            {
+              name: '百公里油耗',
+              type: 'line',
+              stack: '总量',
+              data: this.lightValue,
+              smooth: true,
+              itemStyle: {
+                normal: {
+                  color: '#8079CB', //改变折线点的颜色
+                  lineStyle: {
+                    color: {
+                      type: 'linear',
+
+                      colorStops: [{
+                        offset: 0,
+                        color: '#DE89C8' // 0% 处的颜色
+                      },
+                        {
+                          offset: 1,
+                          color: '#8079CB' // 100% 处的颜色
+                        }],
+                      globalCoord: false // 缺省为 false
+                    }, //改变折线颜色
+                  }
+                }
+              },
+            }
+          ]
+        };
+
+
+        myChart2.setOption(option2);
+      },
+      //动力总成预防性维护车辆信息页面echarts绘制
+      carTeamEcharts1() {
+        const that = this;
+        that.carTeamEcharts1view = echarts.init(document.getElementById('report-2-eharts1'));
+        let y_data = this.plateList,
+          _data1 = this.mileageList;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          title: [{
+            text: '运行里程(km)',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 18
+            }
+          },
+            {
+              text: 'Mileage',
+              top: '7%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          grid: {
+            containLabel: true,
+            left: 15,
+            right: 0,
+            bottom: 30,
+
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }
+          ],
+          series: [
+            {
+              type: 'bar',
+              name: '运行里程',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 20,
+              barMinHeight: 28,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(27,53,91)',
+
+                },
+                emphasis: {
+                  color: '#7E47FF',
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamEcharts1view.setOption(option);
+      },
+      carTeamEcharts2() {
+        const that = this;
+        that.carTeamEcharts2view = echarts.init(document.getElementById('report-2-eharts2'));
+        let y_data = this.plateList,
+          _data1 = this.runTimeList;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          title: [{
+            text: '运行时间(h)',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 18
+            }
+          },
+            {
+              text: 'Runtime',
+              top: '7%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          grid: {
+            containLabel: true,
+            left: 15,
+            right: 0,
+            bottom: 30
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '运行时间(h)',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 20,
+              barMinHeight: 28,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(46,136,229)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamEcharts2view.setOption(option);
+      },
+      carTeamEcharts3() {
+        const that = this;
+        that.carTeamEcharts3view = echarts.init(document.getElementById('report-2-eharts3'));
+        let y_data = this.plateList,
+          _data1 = this.attendanceList;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          title: [{
+            text: '出勤天数',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 18
+            }
+          },
+            {
+              text: 'Attendance',
+              top: '7%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          grid: {
+            containLabel: true,
+            left: 15,
+            right: 0,
+            bottom: 30
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '出勤天数',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 20,
+              barMinHeight: 28,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(46,136,229)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamEcharts3view.setOption(option);
+      },
+      carTeamEcharts4() {
+        const that = this;
+        that.carTeamEcharts4view = echarts.init(document.getElementById('report-2-eharts4'));
+        let y_data = this.plateList,
+          _data1 = this.fuelConsList;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          title: [{
+            text: '百公里油耗(L/100km)',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 18
+            }
+          },
+            {
+              text: 'Fuel Consumption',
+              top: '7%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          grid: {
+            containLabel: true,
+            left: 15,
+            right: 0,
+            bottom: 30
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '百公里油耗(L/100km)',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 20,
+              barMinHeight: 28,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(46,136,229)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamEcharts4view.setOption(option);
+      },
+      carTeamEcharts5() {
+        const that = this;
+        that.carTeamEcharts5view = echarts.init(document.getElementById('report-2-eharts5'));
+        let y_data = this.plateList,
+          _data1 = this.fuelConsumptionRatioList;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          title: [{
+            text: '单位扭矩百公里油耗',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 18
+            }
+          },
+            {
+              text: `Fuel Consumption ratio \n /(L/100km%)`,
+              top: '7%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          grid: {
+            containLabel: true,
+            left: 15,
+            right: 0,
+            bottom: 30
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '单位扭矩百公里油耗',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 20,
+              barMinHeight: 28,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(46,136,229)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamEcharts5view.setOption(option);
+      },
+      carTeamEcharts6() {
+        const that = this;
+        that.carTeamEcharts6view = echarts.init(document.getElementById('report-2-eharts6'));
+        let y_data = this.plateList,
+          _data1 = this.fuelCostList;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          title: [{
+            text: '总油耗',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 18
+            }
+          },
+            {
+              text: 'Fuel consumption',
+              top: '7%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          grid: {
+            containLabel: true,
+            left: 15,
+            right: 0,
+            bottom: 30
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '油耗',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 20,
+              barMinHeight: 28,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(45,207,51)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamEcharts6view.setOption(option);
+      },
+      carTeamEcharts7() {
+        const that = this;
+        that.carTeamEcharts7view = echarts.init(document.getElementById('report-2-eharts7'));
+        let legendData = ['超转速', '空挡滑行', '超速'];
+
+        let y_data = this.safePlateList,
+          _data1 = this.engineOverSpeedList,
+          _data2 = this.coastingList,
+          _data3 = this.vehicleOverSpeedList;
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 10
+            }
+          }
+        };
+        option = {
+          title: [{
+            text: '驾驶不安全(次/千公里)',
+            top: '1%',
+            textStyle: {
+              color: '#000',
+              fontStyle: 'normal',
+              fontWeight: 'bolder',
+              fontSize: 18
+            }
+          },
+            {
+              text: 'Safety driving',
+              top: '7%',
+              textStyle: {
+                color: '#ccc',
+                fontStyle: 'normal',
+                fontWeight: '400',
+                fontFamily: 'sans-serif',
+                fontSize: 14
+              }
+            }
+          ],
+          legend: {
+            data: legendData,
+            bottom: '1%',
+            textStyle: {
+              color: '#ccc'
+            }
+          },
+          grid: {
+            containLabel: true,
+            left: 15,
+            right: 0,
+            bottom: 30
+          },
+          tooltip: {
+            trigger: 'axis',
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 12,
+              color: 'black'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          }, {
+            show: false,
+            data: y_data,
+            axisLine: {
+              show: false
+            }
+          }],
+          series: [{
+            type: 'bar',
+            name: '超转速',
+            stack: '2',
+            label: _label,
+            legendHoverLink: false,
+            barWidth: 20,
+            barMinHeight: 20,
+            itemStyle: {
+              normal: {
+                color: 'rgb(213,58,53)'
+              },
+              emphasis: {
+                color: '#7E47FF'
+              }
+            },
+            data: _data1
+          }, {
+            type: 'bar',
+            name: '空挡滑行',
+            stack: '2',
+            legendHoverLink: false,
+            barWidth: 20,
+            barMinHeight: 20,
+            label: _label,
+            itemStyle: {
+              normal: {
+                color: 'rgb(51,75,92)'
+              },
+              emphasis: {
+                color: '#FD5916'
+              }
+            },
+            data: _data2
+          }, {
+            type: 'bar',
+            stack: '2',
+            name: '超速',
+            legendHoverLink: false,
+            barWidth: 20,
+            barMinHeight: 20,
+            label: _label,
+            itemStyle: {
+              normal: {
+                color: 'rgb(106,176,184)'
+              },
+              emphasis: {
+                color: '#01A4F7'
+              }
+            },
+            data: _data3
+          }
+          ]
+        };
+
+        that.carTeamEcharts7view.setOption(option);
+      },
+      //动力总成预防性维护车辆安全页面echarts绘制
+      carTeamSafeEcharts1() {
+        const that = this;
+        that.carTeamSafeEcharts1view = echarts.init(document.getElementById('report-2-safe-eharts1'));
+        let y_data = this.coastingPercentPlate,
+          _data1 = this.coastingPercentValue;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 16
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          grid: {
+            containLabel: true,
+            top: 10,
+            left: 15,
+            right: 15,
+            bottom: 15
+          },
+          tooltip: {
+            trigger: 'axis',
+            position: ['50%', '60%']
+
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 16,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '发动机超转速时间占比/ Engine over speed percentage（超转速超过2000rpm）',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 25,
+              barMinHeight: 30,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(27,53,91)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamSafeEcharts1view.setOption(option);
+      },
+      carTeamSafeEcharts2() {
+        const that = this;
+        that.carTeamSafeEcharts2view = echarts.init(document.getElementById('report-2-safe-eharts2'));
+        let y_data = this.enginOverSpeedPercentPlate,
+          _data1 = this.enginOverSpeedPercentValue;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 16
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          grid: {
+            containLabel: true,
+            top: 10,
+            left: 15,
+            right: 15,
+            bottom: 15
+          },
+          tooltip: {
+            trigger: 'axis',
+            position: ['50%', '60%']
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 16,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '空挡滑行时间占比/ Coasting percentage',
+              stack: '2',
+              label: _label,
+              legendHoverLink: false,
+              barWidth: 25,
+              barMinHeight: 30,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(27,53,91)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamSafeEcharts2view.setOption(option);
+      },
+      carTeamSafeEcharts3() {
+        const that = this;
+        that.carTeamSafeEcharts3view = echarts.init(document.getElementById('report-2-safe-eharts3'));
+        let y_data = this.overSpeedPercentPlate,
+          _data1 = this.overSpeedPercentValue;
+
+        let _label = {
+          normal: {
+            show: true,
+            position: 'inside',
+            textStyle: {
+              color: '#fff',
+              fontSize: 16
+            }
+          }
+        };
+        option = {
+          // backgroundColor: '#091034',
+          grid: {
+            containLabel: true,
+            top: 10,
+            left: 15,
+            right: 15,
+            bottom: 15
+          },
+          tooltip: {
+            trigger: 'axis',
+            position: ['50%', '60%']
+          },
+          xAxis: {
+            axisLabel: {
+              show: false,
+              formatter: function (v) {
+                var _v = (v / _max * 100).toFixed(0);
+                return _v == 0 ? _v : _v + '%';
+              }
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+
+          },
+          yAxis: [{
+            data: y_data,
+            axisLabel: {
+              fontSize: 16,
+              color: '#000'
+
+            },
+            axisLine: {
+              show: false
+            },
+            axisTick: {
+              show: false
+            },
+            splitLine: {
+              show: false
+            }
+          },
+            {
+              show: false,
+              data: y_data,
+              axisLine: {
+                show: false
+              }
+            }],
+          series: [
+            {
+              type: 'bar',
+              name: '运行里程',
+              stack: '2',
+              label: _label,
+              barMinHeight: 30,
+              legendHoverLink: false,
+              barWidth: 25,
+              markLine: {
+                symbol: 'none',//去掉箭头
+                itemStyle: {
+                  normal: {
+                    lineStyle: {type: 'solid', color: 'red', width: 3},
+                    label: {show: true, position: 'left'}
+                  }
+                },
+                data: [
+                  {type: 'average', name: '平均值'}
+                ]
+              },
+              itemStyle: {
+                normal: {
+                  color: 'rgb(27,53,91)'
+                },
+                emphasis: {
+                  color: '#7E47FF'
+                }
+              },
+              data: _data1
+            },
+          ]
+        };
+
+
+        that.carTeamSafeEcharts3view.setOption(option);
+      },
+    },
+    created() {
+      // 显示上一个月份
+      var date = new Date();
+      this.carDate = date.getMonth();
+
+
+      //车队油耗分析报告页面内数据获取
+      // let ip = 'http://10.8.172.112:8080';
+      // var ip = 'http://10.0.0.197:8080';
+      // let ip = 'http://192.168.1.11:8082';
+      let ip = 'http://localhost:8080';
+      axios({
+        url: ip + '/api/video',
+      }).then((res) => {
+        for (let i of res.data.data) {
+            this.videoData.push({video: './videos/' + i + '.mp4', name: i})
+        }
+        for (let s of res.data.data) {
+          this.twoVideoData.push({video: './videos/' + s + '.mp4', name: s})
+        }
+        if(res.data.data.length==1){
+          this.one=true;
+          this.two=false;
+        }else{
+          this.two=true;
+          this.one=false;
+        }
+
+      });
+
+
+      axios({
+        url: ip + '/api/fleet/query/list',
+      }).then((res) => {
+        if (res.data.code === 0) {
+          alert(res.data.data)
+        }
+        const data = res.data.data;
+        this.carList = data;
+
+        this.fleet = this.carList[0].label
+      });
+      axios({
+        url: ip + '/api/dashboard/vehicleInfo',
+      }).then((res) => {
+        const data = res.data.data;
+        for (let a of data) {
+          this.mapData.push(a);
+        }
+
+      });
+      axios({
+        url: ip + '/api/dashboard/fuel',
+      }).then((res) => {
+        const data = res.data.data;
+        for (let item of data.heavy) {
+          this.heavyTime.push(item.dataTime);
+          this.heavyValue.push(item.dataValue)
+        }
+        for (let items of data.light) {
+          this.lightTime.push(items.dataTime);
+          this.lightValue.push(items.dataValue)
+        }
+
+      });
+      axios({
+        url: ip + '/api/dashboard/indicator',
+      }).then((res) => {
+        const data = res.data.data[0];
+        this.runningNumber = data.runningNumber;
+        this.runningTime = data.runningTime;
+        this.cumulativeMileage = data.cumulativeMileage;
+        this.fuelConsumptionHeavy = data.fuelConsumptionHeavy;
+        this.consumptionRingHeavy = data.consumptionRingHeavy;
+        this.fuelConsumptionLightweight = data.fuelConsumptionLightweight;
+        this.consumptionRingLightweight = data.consumptionRingLightweight;
+        this.overallRatingHeavy = data.overallRatingHeavy;
+        this.ratingRingHeavy = data.ratingRingHeavy;
+        this.overallRatingLightweight = data.overallRatingLightweight;
+        this.ratingRingLightweight = data.ratingRingLightweight;
+        this.consumptionRingHeavyShow = Math.abs(this.consumptionRingHeavy);
+        this.consumptionRingLightweightShow = Math.abs(this.consumptionRingLightweight);
+        this.ratingRingHeavyShow = Math.abs(this.ratingRingHeavy);
+        this.ratingRingLightweightShow = Math.abs(this.ratingRingLightweight);
+
+      });
+    },
+    mounted() {
+
+      //video展示页面点击播放就全屏得方法
+      let video1 = this.$refs.video1;
+      let video2 = this.$refs.video2;
+      let video3 = this.$refs.video3;
+      video1.addEventListener('play', () => {
+        video1.webkitRequestFullScreen();
+      });
+      // video2.addEventListener( 'play', () => {
+      //     video2.webkitRequestFullScreen();
+      // } );
+      video3.addEventListener('play', () => {
+        video3.webkitRequestFullScreen();
+      })
+
+    }
+  })
+
+</script>
+
+</body>
+</html>
